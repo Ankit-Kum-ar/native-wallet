@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { Alert } from "react-native";
 
-const API_URL = "http://10.0.2.2:5500/api/v1/transactions"; // For Android emulator
+const API_URL = "https://native-wallet-2pz2.onrender.com/api/v1/transactions"; // For Android emulator
 // OR
 // const API_URL = "http://<YOUR_PC_IP>:5500/api/v1/transactions"; // For physical device
 
@@ -24,7 +24,7 @@ export const useTransactions = (user_id) => {
             // } 
             const data = await response.json();
             // console.log("Fetched transactions:", data);
-            console.log("Fetched transactions:", data);
+            console.log("Fetched transactions:", data.data || []);
             setTransactions(data.data || []);
         } catch (error) {
             console.error("Error fetching transactions:", error);
@@ -41,7 +41,7 @@ export const useTransactions = (user_id) => {
             //     throw new Error("Failed to fetch summary");
             // }
             const data = await response.json();
-            console.log("Fetched summary:", data);
+            console.log("Fetched summary:", data.data);
             setSummary(data.data || { income: 0, expenses: 0, balance: 0 }); // <-- Fix here
         } catch (error) {
             console.error("Error fetching summary:", error);

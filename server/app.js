@@ -1,20 +1,33 @@
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const express = require('express');
+const { PORT } = require('./config/env');
+const { connectDB } = require('./config/db');
+const transactionsRouter = require('./routes/transactions.route');
+const rateLimiter = require('./middlewares/rateLimiter');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-
-var app = express();
-
-app.use(logger('dev'));
+const app = express();
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({ extended: true }));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+// Middleware for rate limiting
+app.use(rateLimiter)
 
-module.exports = app;
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'Welcome to the Expense Tracker API',
+  });
+}
+);
+ 
+// Routes
+app.use('/api/v1/transactions', transactionsRouter);
+
+connectDB().then(() => {
+  // Start the server after successful database connection
+  app.listen(PORT, () => {
+    console.log(`Server is running on URL: http://localhost:${PORT}`);
+  });
+}).catch((error) => {
+    console.error('Failed to start server due to database connection error:', error);
+    process.exit(1); // Exit the process with a failure code
+});

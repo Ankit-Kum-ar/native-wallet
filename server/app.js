@@ -1,15 +1,27 @@
 const express = require('express');
-const { PORT } = require('./config/env');
+const { PORT, NODE_ENV } = require('./config/env');
 const { connectDB } = require('./config/db');
 const transactionsRouter = require('./routes/transactions.route');
 const rateLimiter = require('./middlewares/rateLimiter');
+const job = require('./config/cron');
 
 const app = express();
+
+if (NODE_ENV === "production") job.start(); // Start the cron job if in production environment
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Middleware for rate limiting
 app.use(rateLimiter)
+
+// Health check route
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'API is healthy',
+  });
+});
 
 app.get('/', (req, res) => {
   res.status(200).json({

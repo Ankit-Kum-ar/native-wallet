@@ -1,5 +1,6 @@
-import cron from "cron";
-import https from "https";
+const cron = require("cron");
+const https = require("https");
+require("dotenv").config();
 
 const job = new cron.CronJob("*/14 * * * *", function () {
   https
@@ -10,7 +11,7 @@ const job = new cron.CronJob("*/14 * * * *", function () {
     .on("error", (e) => console.error("Error while sending request", e));
 });
 
-export default job;
+module.exports = job;
 
 
 // CRON JOB EXPLANATION:
